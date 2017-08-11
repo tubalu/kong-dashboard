@@ -37,6 +37,24 @@ gulp.task('build_js', function () {
     .pipe(gulp.dest(paths.dist + '/js'));
 });
 
+gulp.task('build_js_dev', function () {
+  return gulp
+    .src([
+      "./node_modules/jquery/dist/jquery.min.js",
+      "./node_modules/angular/angular.min.js",
+      "./node_modules/angular-route/angular-route.min.js",
+      "./node_modules/angular-cookies/angular-cookies.min.js",
+      "./node_modules/angular-animate/angular-animate.min.js",
+      "./node_modules/angular-sanitize/angular-sanitize.min.js",
+      "./node_modules/materialize-css/dist/js/materialize.min.js",
+      "./node_modules/ng-infinite-scroll/build/ng-infinite-scroll.min.js",
+      paths.js_src + '/**/*.js'
+    ])
+    .pipe(plumber())
+    .pipe(concat('app.min.js'))
+    .pipe(gulp.dest(paths.dist + '/js'));
+});
+
 gulp.task('build_html', function() {
   gulp.src([paths.html_src + '/index.html'])
     .pipe(gulp.dest(paths.dist));
@@ -58,15 +76,28 @@ gulp.task('build_css', function() {
     .pipe(gulp.dest(paths.dist + '/css'));
 });
 
-gulp.task('build', ['build_js', 'build_css', 'build_html']);
-
-gulp.task('watch', function() {
-  gulp.watch(paths.js_src + '/**/*.js', ['build_js']);
-  gulp.watch(paths.html_src + '/**/*.html', ['build_html']);
-  gulp.watch(paths.sass_src + '/**/*.scss', ['build_css']);
+gulp.task('build_css_dev', function() {
+  var src_file = 'app.scss';
+  if (fs.existsSync(paths.sass_src + '/custom_app.scss')) {
+    src_file = 'custom_app.scss';
+  }
+  gulp.src([paths.sass_src + '/' + src_file])
+    .pipe(plumber())
+    .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+    .pipe(concat('app.min.css'))
+    .pipe(gulp.dest(paths.dist + '/css'));
 });
 
-gulp.task('serve', ['build', 'watch'], function() {
+gulp.task('build', ['build_js', 'build_css', 'build_html']);
+gulp.task('build_dev', ['build_js_dev', 'build_css_dev', 'build_html']);
+
+gulp.task('watch', function() {
+  gulp.watch(paths.js_src + '/**/*.js', ['build_js_dev']);
+  gulp.watch(paths.html_src + '/**/*.html', ['build_html']);
+  gulp.watch(paths.sass_src + '/**/*.scss', ['build_css_dev']);
+});
+
+gulp.task('serve', ['build_dev', 'watch'], function() {
   var args = process.argv;
   args.push('start');
   args = args.slice(3);

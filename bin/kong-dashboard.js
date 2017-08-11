@@ -23,7 +23,7 @@ var validCommands = ['start', 'build']
 if (argv.help || hasInvalidOptions(argv) || validCommands.indexOf(argv._[0]) < 0) {
     console.log("Usage:");
     console.log(" * kong-dashboard build");
-    console.log(" * kong-dashboard start [-p 8080] [-a user=password]");
+    console.log(" * kong-dashboard start [-p 8080] [-a user=password] [-u http://localhost:8001]");
     process.exit();
 }
 

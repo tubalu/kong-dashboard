@@ -3,6 +3,9 @@
  */
 angular.module('app')
   .factory('Kong', ['$http', '$q', '$cookies', 'Request', 'Alert', function ($http, $q, $cookies, Request, Alert) {
+
+      debugger;
+
     var config = {
       url : $cookies.getObject('config.url'),
       auth : { type : "no_auth" },
@@ -26,6 +29,9 @@ angular.module('app')
       },
 
       checkConfig: function (config) {
+
+          debugger;
+
         var url = config.url;
         if (config.auth.type === 'basic_auth') {
           var auth_string = btoa(config.auth.username + ':' + config.auth.password);

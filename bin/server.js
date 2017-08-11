@@ -29,7 +29,7 @@ webapp.use(function* (next) {
   // defense against clickjacking - https://www.owasp.org/index.php/Clickjacking
   this.set('X-Frame-Options', 'Deny');
   if (kongurl)
-    this.set('Set-Cookie', "config.url=" + kongurl);
+    this.set('Set-Cookie', "config.url=\"" + kongurl+"\"");
 });
 
 // Middleware handling authentication failure

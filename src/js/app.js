@@ -159,7 +159,9 @@ var app = angular.module('app', ['ngRoute', 'ngCookies', 'ngAnimate', 'ngSanitiz
   }])
   .run(['$rootScope', 'Kong', '$location', function ($rootScope, Kong, $location) {
     $rootScope.initialized = false;
+
     debugger;
+
     Kong.checkConfig(Kong.config).then(function () {
       $rootScope.app = Kong;
       $rootScope.initialized = true;
