@@ -3,7 +3,8 @@ var app = angular.module('app', ['ngRoute', 'ngCookies', 'ngAnimate', 'ngSanitiz
 
     var appStarted = false;
 
-    var isAppReady = ['Kong', '$location', function(Kong, $location) {
+    var isAppReady = ['Kong', '$location', function (Kong, $location) {
+      debugger;
       if (appStarted) {
         return true;
       }
@@ -37,7 +38,9 @@ var app = angular.module('app', ['ngRoute', 'ngCookies', 'ngAnimate', 'ngSanitiz
         controller: 'ApiController',
         resolve: {
           isAppReady: isAppReady,
-          api: function() {return {}}
+          api: function () {
+            return {}
+          }
         }
       })
       .when('/apis/:id', {
@@ -56,7 +59,7 @@ var app = angular.module('app', ['ngRoute', 'ngCookies', 'ngAnimate', 'ngSanitiz
         controller: 'PluginsController',
         resolve: {
           isAppReady: isAppReady,
-          owner: ['Kong', '$route', function(Kong, $route) {
+          owner: ['Kong', '$route', function (Kong, $route) {
             var api_id = $route.current.params.api_id;
             return Kong.get('/apis/' + api_id);
           }]
@@ -67,7 +70,7 @@ var app = angular.module('app', ['ngRoute', 'ngCookies', 'ngAnimate', 'ngSanitiz
         controller: 'PluginsController',
         resolve: {
           isAppReady: isAppReady,
-          owner: ['Kong', '$route', function(Kong, $route) {
+          owner: ['Kong', '$route', function (Kong, $route) {
             var consumer_id = $route.current.params.consumer_id;
             return Kong.get('/consumers/' + consumer_id);
           }]
@@ -78,7 +81,9 @@ var app = angular.module('app', ['ngRoute', 'ngCookies', 'ngAnimate', 'ngSanitiz
         controller: 'PluginsController',
         resolve: {
           isAppReady: isAppReady,
-          owner: function() { return {};}
+          owner: function () {
+            return {};
+          }
         }
       })
       .when('/plugins/add', {
@@ -86,16 +91,16 @@ var app = angular.module('app', ['ngRoute', 'ngCookies', 'ngAnimate', 'ngSanitiz
         controller: 'PluginController',
         resolve: {
           isAppReady: isAppReady,
-          plugin: function() {
+          plugin: function () {
             return null;
           },
           plugins: ['Kong', function (Kong) {
             return Kong.get('/plugins/enabled');
           }],
-          apis: ['Kong', '$location', function(Kong) {
+          apis: ['Kong', '$location', function (Kong) {
             return Kong.get('/apis');
           }],
-          consumers: ['Kong', '$location', function(Kong) {
+          consumers: ['Kong', '$location', function (Kong) {
             return Kong.get('/consumers?size=1000');
           }]
         }
@@ -112,10 +117,10 @@ var app = angular.module('app', ['ngRoute', 'ngCookies', 'ngAnimate', 'ngSanitiz
           plugins: ['Kong', function (Kong) {
             return Kong.get('/plugins/enabled');
           }],
-          apis: ['Kong', '$location', function(Kong) {
+          apis: ['Kong', '$location', function (Kong) {
             return Kong.get('/apis');
           }],
-          consumers: ['Kong', '$location', function(Kong) {
+          consumers: ['Kong', '$location', function (Kong) {
             return Kong.get('/consumers');
           }]
         }
@@ -132,7 +137,9 @@ var app = angular.module('app', ['ngRoute', 'ngCookies', 'ngAnimate', 'ngSanitiz
         controller: 'ConsumerController',
         resolve: {
           isAppReady: isAppReady,
-          consumer: function() { return {}; },
+          consumer: function () {
+            return {};
+          },
         }
       })
       .when('/consumers/:id', {
@@ -146,14 +153,17 @@ var app = angular.module('app', ['ngRoute', 'ngCookies', 'ngAnimate', 'ngSanitiz
           }]
         }
       })
-      .otherwise({redirectTo: '/'});
+      .otherwise({
+        redirectTo: '/'
+      });
   }])
-  .run(['$rootScope', 'Kong', '$location', function($rootScope, Kong, $location) {
+  .run(['$rootScope', 'Kong', '$location', function ($rootScope, Kong, $location) {
     $rootScope.initialized = false;
-    Kong.checkConfig(Kong.config).then(function() {
+    debugger;
+    Kong.checkConfig(Kong.config).then(function () {
       $rootScope.app = Kong;
       $rootScope.initialized = true;
-    }, function() {
+    }, function () {
       Kong.config.url = null;
       $rootScope.app = Kong;
       $rootScope.initialized = true;
@@ -161,6 +171,6 @@ var app = angular.module('app', ['ngRoute', 'ngCookies', 'ngAnimate', 'ngSanitiz
     });
 
     $rootScope.Utils = {
-      keys : Object.keys
+      keys: Object.keys
     };
   }]);

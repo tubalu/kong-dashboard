@@ -5,8 +5,9 @@ var argv = parseArgs(process.argv.slice(2));
 var child_process = require('child_process');
 
 // validate options
-var validOptions = ['_', 'a', 'p'];
-function hasInvalidOptions (argv) {
+var validOptions = ['_', 'a', 'p', 'u'];
+
+function hasInvalidOptions(argv) {
     var isInvalid = false;
     Object.keys(argv).some(function (optionName) {
         if (validOptions.indexOf(optionName) < 0) {
@@ -35,11 +36,15 @@ if (argv._[0] === 'build') {
 if (argv._[0] === 'start') {
     var port = argv.p ? argv.p : 8080;
     var auth = argv.a;
+    var url = argv.u;
 
     // launch server
     console.log('Launching webserver');
     if (port) {
         process.env['kong-dashboard-port'] = port;
+    }
+    if (url) {
+        process.env['kong-dashboard-url'] = url;
     }
     if (auth) {
         auth = auth.split('=');

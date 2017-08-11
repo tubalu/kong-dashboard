@@ -14,6 +14,8 @@ var url_parser = require('url');
 
 var name = process.env['kong-dashboard-name'];
 var pass = process.env['kong-dashboard-pass'];
+var kongurl = process.env['kong-dashboard-url'];
+
 
 /////////////////////////
 // Serving angular app //
@@ -21,15 +23,17 @@ var pass = process.env['kong-dashboard-pass'];
 var webapp = koa();
 
 // Middleware adding response headers
-webapp.use(function *(next){
+webapp.use(function* (next) {
   yield next;
 
   // defense against clickjacking - https://www.owasp.org/index.php/Clickjacking
   this.set('X-Frame-Options', 'Deny');
+  if (kongurl)
+    this.set('Set-Cookie', "config.url=" + kongurl);
 });
 
 // Middleware handling authentication failure
-webapp.use(function *(next){
+webapp.use(function* (next) {
   try {
     yield next;
   } catch (err) {
@@ -45,7 +49,10 @@ webapp.use(function *(next){
 
 // Authentication middleware, if app started with basic auth.
 if (name && pass) {
-  webapp.use(koa_auth({ name: name, pass: pass }));
+  webapp.use(koa_auth({
+    name: name,
+    pass: pass
+  }));
 }
 
 // Serving angular app.
@@ -61,7 +68,7 @@ var proxy = httpProxy.createProxyServer({
 });
 
 // Authentication middleware, if app started with basic auth.
-proxyapp.use(function *(next){
+proxyapp.use(function* (next) {
   if (this.request.method !== 'OPTION' && name && pass) {
     var user = auth(this);
     if (user && user.name == name && user.pass == pass) {
@@ -75,7 +82,7 @@ proxyapp.use(function *(next){
 });
 
 // proxy requests
-proxyapp.use(function *(next){
+proxyapp.use(function* (next) {
 
   var ctx = this;
 
@@ -96,13 +103,15 @@ proxyapp.use(function *(next){
 
   // proxy requests
   yield new Promise(function (resolve, reject) {
-    proxy.web(proxied_req, ctx.res, {target: ctx.request.headers['kong-node-url']});
+    proxy.web(proxied_req, ctx.res, {
+      target: ctx.request.headers['kong-node-url']
+    });
   });
 });
 
 // Proxy response error handling
 
-proxy.on('proxyRes', function(proxyRes, req, res) {
+proxy.on('proxyRes', function (proxyRes, req, res) {
   if (proxyRes.statusCode == 401) {
     // forwarding the 401 would make browsers invoke basic auth popup.
     proxyRes.statusCode = 511;
@@ -112,7 +121,7 @@ proxy.on('proxyRes', function(proxyRes, req, res) {
   }
 });
 
-proxy.on('error', function(err, req, res) {
+proxy.on('error', function (err, req, res) {
   if (err.code == 'ECONNRESET' || err.code == 'ECONNREFUSED' || err.code == 'ENOTFOUND') {
     res.writeHead(400, {
       'Content-Type': 'application/json'
